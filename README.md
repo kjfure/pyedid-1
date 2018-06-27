@@ -4,9 +4,6 @@ for linux get EDID information and parsing.
 
 e.g.
 
-#! /usr/bin/env python
-# -*- coding:utf-8 -*-
-
 import pyedid
 
 print pyedid.get_monitor_info()
