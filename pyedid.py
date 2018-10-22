@@ -1,11 +1,9 @@
 #! /usr/bin/env python
 # -*-coding:utf-8-*-
+import binascii
 import os
 import platform
-import binascii
-import time
 import socket
-import datetime
 
 
 def _get_edid(edid):
@@ -16,7 +14,7 @@ def _get_edid(edid):
                       '11001': 'Y', '11010': 'Z', '11011': '', '11100': '', '11101': '', '11110': '',
                       '11111': '', '00000': ''}
     month_dict = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct',
-                  11: 'Nov', 12: 'Dec'}
+                  11: 'Nov', 12: 'Dec', 0: 'Error'}
     tmp_bin = ''
     for i in edid[16:20]:
         tmp_bin += bin(int(i, 16)).replace('0b', '').zfill(4)
@@ -32,8 +30,7 @@ def _get_edid(edid):
     return {'manufacturer': manufacturer, 'model': model, 'sn': sn, 'date_of_Mfg': date_of_Mfg}
 
 
-def get_monitor_info():
-
+def monitor_info():
     hostname = socket.getfqdn()
 
     if platform.system() == "Linux":
@@ -87,14 +84,6 @@ def get_monitor_info():
                         else:
                             edid_dict[tmp_num][tmp[0]] = tmp[1].replace(' ', '')
                 edid_dict[tmp_num] = dict(_get_edid(edid_dict[tmp_num]['EDID']).items() + edid_dict[tmp_num].items())
-        # with open('/tmp/monitor.info', 'w') as f:
-        #     f.write('')
+                edid_dict[tmp_num]['hostname'] = hostname
 
-        info = ''
-        for key in edid_dict.keys():
-            info += "%s: %s\t%s\t%s\t%s\t%s\t%s\t%s\r\n" % (
-            key, edid_dict[key]['model'], edid_dict[key]['port'], edid_dict[key]['connect'], edid_dict[key]['sn'],
-            edid_dict[key]['date_of_Mfg'], hostname, datetime.datetime.now())
-            # with open('/tmp/monitor.info', 'a') as f:
-            #     f.write(str(info))
-    return info
+    return edid_dict
